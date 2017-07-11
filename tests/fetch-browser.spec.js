@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var ThenPromise = require('promise');
-var fetchWrapper = require('../build/fetch-browser');
+var fetch = require('../build/fetch-browser');
 
 function responseToText(response) {
   return response.text();
@@ -30,7 +30,7 @@ describe('fetch in browser', function () {
     var fetch;
 
     beforeEach(function () {
-      fetch = fetchWrapper();
+      fetch = require('../build/fetch-browser');
       sandbox.server.respondWith('https://blah.com/hello.world', 'Some response text.');
       sandbox.server.respondWith('https://blah.com/goodbye.world', 'Some other response text.');
       promise = fetch.fetch('https://blah.com/hello.world');
@@ -75,7 +75,7 @@ describe('fetch in browser', function () {
     it('allows whatwg-fetch to feature detect properly', function () {
       self.Blob = function () {};
 
-      var fetch = fetchWrapper();
+      var fetch = require('../build/fetch-browser');
 
       return fetch.fetch('https://blah.com/goodbye.world')
         .then(function (res) {
@@ -92,7 +92,7 @@ describe('fetch in browser', function () {
     var fetch;
 
     beforeEach(function () {
-      fetch = fetchWrapper({});
+      fetch = require('../build/fetch-browser');
       sandbox.server.respondWith('https://blah.com/hello.world', 'Some response text.');
       sandbox.server.respondWith('https://blah.com/goodbye.world', 'Some other response text.');
       promise = fetch.fetch('https://blah.com/hello.world');
@@ -137,7 +137,7 @@ describe('fetch in browser', function () {
     it('allows whatwg-fetch to feature detect properly', function () {
       self.Blob = function () {};
 
-      var fetch = fetchWrapper({});
+      var fetch = require('../build/fetch-browser');
 
       return fetch.fetch('https://blah.com/goodbye.world')
         .then(function (res) {
@@ -154,10 +154,10 @@ describe('fetch in browser', function () {
     var fetch;
 
     beforeEach(function () {
-      fetch = fetchWrapper({ Promise: ThenPromise });
+      fetch = require('../build/fetch-browser');
       sandbox.server.respondWith('https://blah.com/hello.world', 'Some response text.');
       sandbox.server.respondWith('https://blah.com/goodbye.world', 'Some other response text.');
-      promise = fetch.fetch('https://blah.com/hello.world');
+      promise = fetch.fetch('https://blah.com/hello.world', null, ThenPromise);
     });
 
     it('exposes fetch, and Request, Response, and Headers methods', function () {
@@ -189,7 +189,7 @@ describe('fetch in browser', function () {
     });
 
     it('can consume Request instances', function () {
-      return fetch.fetch(new fetch.Request('https://blah.com/goodbye.world'))
+      return fetch.fetch(new fetch.Request('https://blah.com/goodbye.world'), null, ThenPromise)
         .then(responseToText)
         .then(function (data) {
           assert.equal(data, 'Some other response text.');
@@ -199,9 +199,9 @@ describe('fetch in browser', function () {
     it('allows whatwg-fetch to feature detect properly', function () {
       self.Blob = function () {};
 
-      var fetch = fetchWrapper({ Promise: ThenPromise });
+      var fetch = require('../build/fetch-browser');
 
-      return fetch.fetch('https://blah.com/goodbye.world')
+      return fetch.fetch('https://blah.com/goodbye.world', null, ThenPromise)
         .then(function (res) {
           return res.blob();
         })

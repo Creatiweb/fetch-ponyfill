@@ -2,7 +2,6 @@
 
 'use strict';
 
-var fetchWrapper = require('../fetch-node');
 var nock = require('nock');
 var assert = require('assert');
 var ThenPromise = require('promise');
@@ -34,11 +33,7 @@ describe('fetch in Node', function () {
   });
 
   describe('when called without a context', function () {
-    var fetch;
-
-    before(function () {
-      fetch = fetchWrapper();
-    });
+    var fetch = require('../fetch-node');
 
     it('uses the built-in promise implementation', function () {
       assert.ok(fetch.fetch('https://mattandre.ws/succeed.txt') instanceof Promise);
@@ -93,11 +88,7 @@ describe('fetch in Node', function () {
   });
 
   describe('when called with a context with no Promise field', function () {
-    var fetch;
-
-    before(function () {
-      fetch = fetchWrapper({});
-    });
+    var fetch = require('../fetch-node');
 
     it('exposes fetch, and Request, Response, and Headers methods', function () {
       assert.deepEqual(Object.keys(fetch).sort(), ['Headers', 'Request', 'Response', 'fetch']);
@@ -152,28 +143,24 @@ describe('fetch in Node', function () {
   });
 
   describe('when called with a context with a Promise field', function () {
-    var fetch;
-
-    before(function () {
-      fetch = fetchWrapper({ Promise: ThenPromise });
-    });
+    var fetch = require('../fetch-node');
 
     it('exposes fetch, and Request, Response, and Headers methods', function () {
       assert.deepEqual(Object.keys(fetch).sort(), ['Headers', 'Request', 'Response', 'fetch']);
     });
 
     it('returns a promise which resolves to an instance of Response', function () {
-      return fetch.fetch('https://mattandre.ws/succeed.txt').then(function (res) {
+      return fetch.fetch('https://mattandre.ws/succeed.txt', null, ThenPromise).then(function (res) {
         assert.ok(res instanceof fetch.Response);
       });
     });
 
     it('uses the a given promise implementation', function () {
-      assert.ok(fetch.fetch('https://mattandre.ws/succeed.txt') instanceof ThenPromise);
+      assert.ok(fetch.fetch('https://mattandre.ws/succeed.txt', null, ThenPromise) instanceof ThenPromise);
     });
 
     it('makes requests', function () {
-      return fetch.fetch('https://mattandre.ws/succeed.txt')
+      return fetch.fetch('https://mattandre.ws/succeed.txt', null, ThenPromise)
         .then(responseToText)
         .then(function (data) {
           assert.equal(data, good);
@@ -181,7 +168,7 @@ describe('fetch in Node', function () {
     });
 
     it('rejects with an error on a bad request', function () {
-      return fetch.fetch('https://mattandre.ws/fail.txt')
+      return fetch.fetch('https://mattandre.ws/fail.txt', null, ThenPromise)
         .then(responseToText)
         .then(
           function () {
@@ -194,7 +181,7 @@ describe('fetch in Node', function () {
     });
 
     it('supports schemaless URIs', function () {
-      return fetch.fetch('//mattandre.ws/succeed.txt')
+      return fetch.fetch('//mattandre.ws/succeed.txt', null, ThenPromise)
         .then(responseToText)
         .then(function (data) {
           assert.equal(data, good);
@@ -202,7 +189,7 @@ describe('fetch in Node', function () {
     });
 
     it('supports request instances', function () {
-      return fetch.fetch(new fetch.Request('https://mattandre.ws/succeed.txt'))
+      return fetch.fetch(new fetch.Request('https://mattandre.ws/succeed.txt'), null, ThenPromise)
         .then(responseToText)
         .then(function (data) {
           assert.equal(data, good);
