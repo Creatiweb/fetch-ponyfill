@@ -12,7 +12,19 @@ When used in Node, delegates to `node-fetch` instead.
 ## Usage
 
 ```javascript
-const {fetch, Request, Response, Headers} = require('fetch-ponyfill')(options);
+const {fetch, Request, Response, Headers} = require('fetch-ponyfill');
+
+fetch('http://example.com');
+
+fetch('http://example.com', {
+  XMLHttpRequest,
+});
+
+fetch('http://example.com', {}, Promise);
+
+fetch('http://example.com', {
+  XMLHttpRequest,
+}, Promise);
 ```
 
 where options is an object with the following optional properties:
